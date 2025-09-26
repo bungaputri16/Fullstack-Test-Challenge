@@ -34,3 +34,4 @@ export class RabbitMQService implements OnModuleInit {
     this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
   }
 }
+

@@ -6,6 +6,7 @@ import { Product } from './product.entity';
 import { ProductRepository } from './product.repository';
 import { RedisModule } from '../redis/redis.module';
 import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
+import { TestController } from './test.controller'; 
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { RabbitMQModule } from '../rabbitmq/rabbitmq.module';
     RedisModule,     
     forwardRef(() => RabbitMQModule), 
 ],
-  controllers: [ProductsController],
+  controllers: [ProductsController, TestController],
   providers: [ProductsService, ProductRepository],
   exports: [ProductsService],
 })

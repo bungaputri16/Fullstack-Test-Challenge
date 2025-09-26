@@ -12,17 +12,19 @@ export class RedisService implements OnModuleInit {
     await this.client.connect();
   }
 
-  async get(key: string): Promise<string | null> {
-    return this.client.get(key);
-  }
+ async get<T>(key: string): Promise<T | null> {
+  const value = await this.client.get(key);
+  return value ? JSON.parse(value) : null;
+}
 
-  async set(key: string, value: string, ttl?: number) {
-    if (ttl) {
-      await this.client.set(key, value, { EX: ttl });
-    } else {
-      await this.client.set(key, value);
-    }
+async set(key: string, value: any, ttl?: number) {
+  const stringValue = JSON.stringify(value);
+  if (ttl) {
+    await this.client.set(key, stringValue, { EX: ttl });
+  } else {
+    await this.client.set(key, stringValue);
   }
+}
 
   async del(key: string) {
     await this.client.del(key);

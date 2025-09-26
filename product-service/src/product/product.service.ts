@@ -11,27 +11,36 @@ export class ProductsService {
     private readonly redisService: RedisService,
     @Inject(forwardRef(() => RabbitMQService))
     private readonly rabbitmqService: RabbitMQService,
-  ) {}
+  ){}
 
+// Method untuk handle event order.created
+private async handleOrderCreated(payload: { productId: number; qty: number }) {
+  console.log('Received order.created event:', payload);
+  try {
+    await this.reduceQty(payload.productId, payload.qty);
+    console.log(`Stock updated for productId: ${payload.productId}`);
+  } catch (err) {
+    console.error('Failed to reduce qty:', err.message);
+  }
+}
+  
  async createProduct(data: Partial<Product>): Promise<Product> {
     const saved = await this.repo.createProduct(data);
     await this.rabbitmqService.publish('product.created', { ...saved });
     return saved;
   }
 
-  async getProduct(id: number): Promise<Product> {
-    // cek cache
-    const cached = await this.redisService.get(`product:${id}`);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+ async getProduct(id: number): Promise<Product> {
+  const cached = await this.redisService.get<Product>(`product:${id}`);
+  if (cached) return cached;
 
-    const product = await this.repo.findById(id);
-    if (!product) throw new NotFoundException('Product not found');
+  const product = await this.repo.findById(id);
+  if (!product) throw new NotFoundException('Product not found');
 
-    await this.redisService.set(`product:${id}`, JSON.stringify(product), 60);
-    return product;
-  }
+  await this.redisService.set(`product:${id}`, product, 60);
+  return product;
+}
+
 
   async reduceQty(productId: number, amount: number) {
     const product = await this.repo.findById(productId);

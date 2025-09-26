@@ -5,9 +5,9 @@ services:
     image: postgres:15
     container_name: postgres_db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: appdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -23,11 +23,37 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: secret
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
       - "5672:5672"   # koneksi dari aplikasi (AMQP)
       - "15672:15672" # dashboard management UI
+
+  product-service:
+    build: ../product-service
+    container_name: product_service
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  # order-service:
+  #   build: ../order-service
+  #   container_name: order_service
+  #   restart: always
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - rabbitmq
+  #   ports:
+  #     - "4000:4000"
+  #   env_file:
+  #     - .env
 
 volumes:
   postgres_data:
