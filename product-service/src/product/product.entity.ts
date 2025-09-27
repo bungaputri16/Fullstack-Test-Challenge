@@ -8,7 +8,12 @@ export class Product {
   @Column()
   name: string;
 
-  @Column('decimal')
+  @Column('decimal', {
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string): number => parseFloat(value),
+    },
+  })
   price: number;
 
   @Column('int')
