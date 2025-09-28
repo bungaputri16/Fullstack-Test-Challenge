@@ -64,16 +64,16 @@ func (s *Service) CreateOrder(productId, qty int) (*Order, error) {
 }
 
 func (s *Service) GetOrdersByProduct(productId int) ([]Order, error) {
-	key := "orders:product:" + strconv.Itoa(productId)
+	// key := "orders:product:" + strconv.Itoa(productId)
 
-	var cached []Order
-	if err := s.rdb.Get(key, &cached); err == nil {
-		// Pastikan slice tidak nil
-		if cached == nil {
-			cached = []Order{}
-		}
-		return cached, nil
-	}
+	// var cached []Order
+	// if err := s.rdb.Get(key, &cached); err == nil {
+	// 	// Pastikan slice tidak nil
+	// 	if cached == nil {
+	// 		cached = []Order{}
+	// 	}
+	// 	return cached, nil
+	// }
 
 	orders, err := s.repo.FindByProductID(productId)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Service) GetOrdersByProduct(productId int) ([]Order, error) {
 		orders = []Order{}
 		}
 		
-	_ = s.rdb.Set(key, orders, 60)
+	// _ = s.rdb.Set(key, orders, 60)
 	
 	return orders, nil
 }
