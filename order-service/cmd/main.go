@@ -24,9 +24,14 @@ func main() {
 	orderHandler := order.NewHandler(orderService)
 
 	r := mux.NewRouter()
+	r.Use(order.RequestID)        
+	r.Use(order.ValidateJSONContent) 
+
 	r.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST")
 	r.HandleFunc("/orders/product/{productId}", orderHandler.GetOrdersByProduct).Methods("GET")
 
 	log.Println("Order-service running on port", cfg.ServicePort)
 	http.ListenAndServe(":"+cfg.ServicePort, r)
+
+	
 }

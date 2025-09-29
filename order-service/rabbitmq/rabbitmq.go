@@ -29,12 +29,15 @@ func NewRabbit(cfg config.Config) *Client {
 	return &Client{conn: conn, channel: ch}
 }
 
-func (c *Client) Publish(queue string, message interface{}) {
-	body, _ := json.Marshal(message)
-	_, err := c.channel.QueueDeclare(queue, true, false, false, false, nil)
+func (c *Client) Publish(queue string, message interface{}) error {
+	body, err := json.Marshal(message)
 	if err != nil {
-		log.Println("Queue declare error:", err)
-		return
+		return err
+	}
+
+	_, err = c.channel.QueueDeclare(queue, true, false, false, false, nil)
+	if err != nil {
+		return err
 	}
 
 	err = c.channel.Publish(
@@ -48,6 +51,7 @@ func (c *Client) Publish(queue string, message interface{}) {
 		},
 	)
 	if err != nil {
-		log.Println("Failed to publish message:", err)
+		return err
 	}
+	return nil
 }

@@ -1,28 +1,20 @@
-# --- Stage 1: Build ---
-FROM golang:1.25.1-alpine AS builder
+FROM golang:1.25-alpine
 
 WORKDIR /app
 
-# copy go mod/sum lalu download deps dulu (biar cache efektif)
+# Copy go.mod & go.sum dulu untuk install dependencies
 COPY go.mod go.sum ./
+
+# Download semua dependencies (termasuk github.com/google/uuid)
+RUN go mod tidy
 RUN go mod download
 
-# copy semua source code
+# Copy seluruh source code
 COPY . .
 
-# build binary
+# Build binary
 RUN go build -o order-service ./cmd/main.go
 
-# --- Stage 2: Run ---
-FROM alpine:3.19
-
-WORKDIR /app
-
-# copy binary dari builder
-COPY --from=builder /app/order-service .
-
-# expose port (default 4000 dari .env)
 EXPOSE 4000
 
-# jalankan service
 CMD ["./order-service"]

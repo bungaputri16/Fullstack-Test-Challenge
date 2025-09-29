@@ -1,8 +1,31 @@
-# Environment
+# --- Environment ---
 .env
 
-# Node
+# --- Node / NestJS ---
 node_modules/
+dist/
+coverage/
 
-# Go
+# --- Go ---
 bin/
+*.exe
+*.out
+*.test
+
+# --- Docker volumes / data ---
+infra/postgres_data/
+infra/redis_data/
+infra/rabbitmq_data/
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- System / Editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

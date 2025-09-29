@@ -56,6 +56,36 @@ services:
     env_file:
       - .env
 
+  gateway-service:
+    build: ../gateway-service
+    ports:
+      - "5000:5000"
+    depends_on:
+      - product-service
+      - order-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  k6:
+    image: loadimpact/k6
+    container_name: k6
+    depends_on:
+      gateway-service:
+        condition: service_healthy
+    entrypoint: ["k6", "run", "/k6/load_test.js"]
+    volumes:
+      - ../k6:/k6
+    networks:
+      - default
+
+
+ 
+
+
 volumes:
   postgres_data:
   
